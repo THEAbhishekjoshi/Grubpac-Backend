@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  principal
+  teacher
+}
+
+enum ContentStatus {
+  pending
+  approved
+  rejected
+}
+
+model User {
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @unique
+  passwordHash String @map("password_hash")
+  role        Role
+  createdAt   DateTime @default(now()) @map("created_at")
+  // Relations
+  contents    Content[] @relation("UploadedBy")
+  approvedContents Content[] @relation("ApprovedBy")
+}
+
+model Content {
+  id               String   @id @default(uuid())
+  title            String
+  description      String?
+  subject          String
+  fileUrl          String? @map("file_url")
+  filePath         String? @map("file_path")
+  fileType         String
+  fileSize         Int? @map("file_size")
+  uploadedById     String
+  uploadedBy       User     @relation("UploadedBy", fields: [uploadedById], references: [id])
+  status           ContentStatus
+  startTime        DateTime? @map("start_time") 
+  endTime          DateTime? @map("end_time")  
+  rejectionReason  String?
+  approvedById     String?
+  approvedBy       User?    @relation("ApprovedBy", fields: [approvedById], references: [id])
+  approvedAt       DateTime?
+  createdAt        DateTime @default(now()) @map("created_at")
+  schedules        ContentSchedule[]
+}
+
+model ContentSlot {
+  id        String   @id @default(uuid())
+  subject   String
+  createdAt DateTime @default(now()) @map("created_at")
+  schedules ContentSchedule[]
+}
+
+model ContentSchedule {
+  id            String   @id @default(uuid())
+  contentId     String
+  slotId        String
+  rotationOrder Int
+  duration      Int // minutes
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  content       Content   @relation(fields: [contentId], references: [id])
+  slot          ContentSlot @relation(fields: [slotId], references: [id])
+}
