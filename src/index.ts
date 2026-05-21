@@ -28,7 +28,7 @@ const publicLimiter = rateLimit({
 })
 
 const authLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hr
+    windowMs: 60 * 60 * 2000, // 2 hr
     max: 20, // limit each IP to 20 login/register attempts per hour
     message: { message: "Too many authentication attempts, please try again after an hour" },
     standardHeaders: true,
