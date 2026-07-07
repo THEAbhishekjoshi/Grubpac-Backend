@@ -36,7 +36,7 @@ const authLimiter = rateLimit({
 })
 
 app.get("/", (req, res) => {
-    res.send("API is running 🙆‍♂️ it's live")
+    res.send("API is running 🙆‍♂️ it's live now !!!")
 })
 
 // Auth Routes
